@@ -1,0 +1,67 @@
+package com.inhatc.tripshare;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.databinding.ActivitySignupBinding;
+import com.inhatc.tripshare.util.CaptchaViewHelper;
+
+public class SignUpActivity extends AppCompatActivity {
+
+    private ActivitySignupBinding binding;
+    private CaptchaViewHelper captchaHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivitySignupBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        captchaHelper = new CaptchaViewHelper(binding.captchaView.getRoot());
+
+        binding.btnBack.setOnClickListener(v -> finish());
+        binding.btnSignup.setOnClickListener(v -> attemptSignUp());
+    }
+
+    private void attemptSignUp() {
+        String email = getText(binding.etEmail);
+        String password = getText(binding.etPassword);
+        String confirm = getText(binding.etConfirmPassword);
+        String nickname = getText(binding.etNickname);
+
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)
+                || TextUtils.isEmpty(confirm) || TextUtils.isEmpty(nickname)) {
+            Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!password.equals(confirm)) {
+            Toast.makeText(this, R.string.password_mismatch, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!captchaHelper.isVerified()) {
+            Toast.makeText(this, R.string.captcha_wrong, Toast.LENGTH_SHORT).show();
+            captchaHelper.refresh();
+            return;
+        }
+        if (!MockData.registerUser(email, password, nickname)) {
+            Toast.makeText(this, R.string.email_exists, Toast.LENGTH_SHORT).show();
+            captchaHelper.refresh();
+            return;
+        }
+
+        Toast.makeText(this, R.string.signup_success, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private String getText(com.google.android.material.textfield.TextInputEditText editText) {
+        return editText.getText() != null ? editText.getText().toString().trim() : "";
+    }
+}
