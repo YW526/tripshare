@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.ActivityLoginBinding;
 import com.inhatc.tripshare.util.CaptchaViewHelper;
 
@@ -13,6 +14,7 @@ public class LoginActivity extends BaseActivity {
 
     private ActivityLoginBinding binding;
     private CaptchaViewHelper captchaHelper;
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +45,29 @@ public class LoginActivity extends BaseActivity {
             captchaHelper.refresh();
             return;
         }
-        if (!MockData.login(email, password)) {
-            Toast.makeText(this, R.string.login_failed, Toast.LENGTH_SHORT).show();
-            captchaHelper.refresh();
-            return;
-        }
 
-        Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        binding.btnLogin.setEnabled(false);
+        repository.login(email, password, new ApiCallback<com.inhatc.tripshare.api.dto.UserDto>() {
+            @Override
+            public void onSuccess(com.inhatc.tripshare.api.dto.UserDto data) {
+                binding.btnLogin.setEnabled(true);
+                Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                binding.btnLogin.setEnabled(true);
+                if ("unauthorized".equals(message)) {
+                    Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+                captchaHelper.refresh();
+            }
+        });
     }
 }

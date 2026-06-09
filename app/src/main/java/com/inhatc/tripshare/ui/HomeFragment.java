@@ -17,15 +17,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.inhatc.tripshare.ItineraryDetailActivity;
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.adapter.TripAdapter;
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.FragmentHomeBinding;
 import com.inhatc.tripshare.model.Trip;
+
+import java.util.List;
 
 public class HomeFragment extends Fragment implements TripAdapter.OnTripClickListener {
 
     private FragmentHomeBinding binding;
     private TripAdapter popularAdapter;
     private TripAdapter latestAdapter;
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Nullable
     @Override
@@ -48,8 +52,7 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
         binding.rvLatest.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvLatest.setAdapter(latestAdapter);
 
-        popularAdapter.setTrips(MockData.getPopularTrips());
-        latestAdapter.setTrips(MockData.getLatestTrips());
+        loadTrips();
 
         binding.btnNotifications.setOnClickListener(v ->
                 Toast.makeText(requireContext(), R.string.notifications_coming, Toast.LENGTH_SHORT).show());
@@ -61,13 +64,34 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                latestAdapter.setTrips(MockData.searchTrips(s.toString()));
+                repository.searchTrips(s.toString(), tripCallback(latestAdapter));
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+
+    private void loadTrips() {
+        repository.getPopularTrips(tripCallback(popularAdapter));
+        repository.getLatestTrips(tripCallback(latestAdapter));
+    }
+
+    private ApiCallback<List<Trip>> tripCallback(TripAdapter adapter) {
+        return new ApiCallback<List<Trip>>() {
+            @Override
+            public void onSuccess(List<Trip> data) {
+                adapter.setTrips(data);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
     }
 
     @Override

@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.inhatc.tripshare.R;
-import com.inhatc.tripshare.data.MockData;
 import com.inhatc.tripshare.model.Trip;
 
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             tvAuthor.setText(trip.getAuthor());
             tvLocation.setText(trip.getLocation());
             tvLikes.setText(String.valueOf(trip.getLikes()));
-            tvComments.setText(String.valueOf(MockData.getReviewCount(trip.getId())));
+            tvComments.setText(String.valueOf(trip.getComments()));
             if (tvDates != null) {
                 tvDates.setText(trip.getDateRange());
                 tvDates.setVisibility(View.VISIBLE);

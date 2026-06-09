@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Trip {
     private final int id;
+    private final long authorUserId;
     private final String title;
     private final String author;
     private final String location;
@@ -17,11 +18,12 @@ public class Trip {
     private final boolean mine;
     private final boolean saved;
 
-    public Trip(int id, String title, String author, String location,
+    public Trip(int id, long authorUserId, String title, String author, String location,
                 String startDate, String endDate, String description,
                 int imageRes, int likes, int comments,
                 List<ScheduleItem> schedule, boolean mine, boolean saved) {
         this.id = id;
+        this.authorUserId = authorUserId;
         this.title = title;
         this.author = author;
         this.location = location;
@@ -38,6 +40,10 @@ public class Trip {
 
     public int getId() {
         return id;
+    }
+
+    public long getAuthorUserId() {
+        return authorUserId;
     }
 
     public String getTitle() {

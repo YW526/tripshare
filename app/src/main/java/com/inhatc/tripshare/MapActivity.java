@@ -2,6 +2,7 @@ package com.inhatc.tripshare;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,7 +11,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.ActivityMapBinding;
 import com.inhatc.tripshare.model.ScheduleItem;
 import com.inhatc.tripshare.model.Trip;
@@ -29,6 +31,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback,
     private GoogleMap googleMap;
     private Trip trip;
     private final Map<Marker, ScheduleItem> markerData = new HashMap<>();
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,19 +40,33 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback,
         setContentView(binding.getRoot());
 
         int tripId = getIntent().getIntExtra(EXTRA_TRIP_ID, 1);
-        trip = MockData.getTripById(tripId);
-
         binding.btnBack.setOnClickListener(v -> finish());
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+        repository.getTrip(tripId, new ApiCallback<Trip>() {
+            @Override
+            public void onSuccess(Trip data) {
+                trip = data;
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.map);
+                if (mapFragment != null) {
+                    mapFragment.getMapAsync(MapActivity.this);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MapActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
+        if (trip == null) {
+            return;
+        }
+
         googleMap = map;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setOnMarkerClickListener(this);

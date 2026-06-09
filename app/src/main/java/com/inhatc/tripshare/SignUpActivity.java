@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.ActivitySignupBinding;
 import com.inhatc.tripshare.util.CaptchaViewHelper;
 
@@ -13,6 +14,7 @@ public class SignUpActivity extends BaseActivity {
 
     private ActivitySignupBinding binding;
     private CaptchaViewHelper captchaHelper;
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +48,30 @@ public class SignUpActivity extends BaseActivity {
             captchaHelper.refresh();
             return;
         }
-        if (!MockData.registerUser(email, password, nickname)) {
-            Toast.makeText(this, R.string.email_exists, Toast.LENGTH_SHORT).show();
-            captchaHelper.refresh();
-            return;
-        }
 
-        Toast.makeText(this, R.string.signup_success, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        binding.btnSignup.setEnabled(false);
+        repository.signUp(email, password, nickname, new ApiCallback<com.inhatc.tripshare.api.dto.UserDto>() {
+            @Override
+            public void onSuccess(com.inhatc.tripshare.api.dto.UserDto data) {
+                binding.btnSignup.setEnabled(true);
+                Toast.makeText(SignUpActivity.this, R.string.signup_success, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                binding.btnSignup.setEnabled(true);
+                if ("conflict".equals(message)) {
+                    Toast.makeText(SignUpActivity.this, R.string.email_exists, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(SignUpActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+                captchaHelper.refresh();
+            }
+        });
     }
 
     private String getText(com.google.android.material.textfield.TextInputEditText editText) {

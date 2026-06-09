@@ -15,13 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.WelcomeActivity;
 import com.inhatc.tripshare.adapter.MenuAdapter;
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.SessionManager;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.FragmentProfileBinding;
 import com.inhatc.tripshare.model.UserProfile;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Nullable
     @Override
@@ -35,12 +38,28 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        UserProfile user = MockData.getCurrentUser();
+        UserProfile user = SessionManager.getProfile();
         binding.tvNickname.setText(user.getNickname());
         binding.tvBio.setText(user.getBio());
-        binding.tvCreatedCount.setText(String.valueOf(user.getCreatedCount()));
-        binding.tvSavedCount.setText(String.valueOf(user.getSavedCount()));
-        binding.tvLikesCount.setText(String.valueOf(user.getLikesReceived()));
+
+        repository.loadProfileStats(new ApiCallback<UserProfile>() {
+            @Override
+            public void onSuccess(UserProfile data) {
+                if (binding == null) {
+                    return;
+                }
+                binding.tvCreatedCount.setText(String.valueOf(data.getCreatedCount()));
+                binding.tvSavedCount.setText(String.valueOf(data.getSavedCount()));
+                binding.tvLikesCount.setText(String.valueOf(data.getLikesReceived()));
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         String[] menuItems = {
                 getString(R.string.edit_profile),
@@ -52,6 +71,7 @@ public class ProfileFragment extends Fragment {
 
         MenuAdapter menuAdapter = new MenuAdapter(menuItems, menu -> {
             if (getString(R.string.logout).equals(menu)) {
+                SessionManager.clear();
                 Intent intent = new Intent(requireContext(), WelcomeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

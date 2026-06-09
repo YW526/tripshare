@@ -9,10 +9,13 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.inhatc.tripshare.adapter.ScheduleInputAdapter;
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.SessionManager;
+import com.inhatc.tripshare.api.TripRepository;
+import com.inhatc.tripshare.api.dto.ScheduleItemRequest;
+import com.inhatc.tripshare.api.dto.TripCreateRequest;
 import com.inhatc.tripshare.databinding.ActivityCreateItineraryBinding;
 import com.inhatc.tripshare.model.ScheduleInput;
-import com.inhatc.tripshare.model.ScheduleItem;
 import com.inhatc.tripshare.model.Trip;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class CreateItineraryActivity extends BaseActivity {
 
     private ActivityCreateItineraryBinding binding;
     private ScheduleInputAdapter scheduleAdapter;
+    private final TripRepository repository = TripRepository.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,33 +68,51 @@ public class CreateItineraryActivity extends BaseActivity {
             return;
         }
 
-        List<ScheduleItem> scheduleItems = buildScheduleItems();
+        List<ScheduleItemRequest> scheduleItems = buildScheduleItems();
         if (scheduleItems.isEmpty()) {
             Toast.makeText(this, R.string.schedule_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Trip trip = MockData.addTrip(title, destination, startDate, endDate,
-                TextUtils.isEmpty(intro) ? title + " 여행 일정입니다." : intro,
+        String description = TextUtils.isEmpty(intro) ? title + " 여행 일정입니다." : intro;
+        TripCreateRequest request = new TripCreateRequest(
+                SessionManager.getUserId(),
+                title,
+                destination,
+                startDate,
+                endDate,
+                description,
                 scheduleItems);
 
-        Toast.makeText(this, R.string.itinerary_registered, Toast.LENGTH_SHORT).show();
+        binding.btnSave.setEnabled(false);
+        repository.createTrip(request, new ApiCallback<Trip>() {
+            @Override
+            public void onSuccess(Trip trip) {
+                binding.btnSave.setEnabled(true);
+                Toast.makeText(CreateItineraryActivity.this, R.string.itinerary_registered, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(CreateItineraryActivity.this, ItineraryDetailActivity.class);
+                intent.putExtra(ItineraryDetailActivity.EXTRA_TRIP_ID, trip.getId());
+                startActivity(intent);
+                finish();
+            }
 
-        Intent intent = new Intent(this, ItineraryDetailActivity.class);
-        intent.putExtra(ItineraryDetailActivity.EXTRA_TRIP_ID, trip.getId());
-        startActivity(intent);
-        finish();
+            @Override
+            public void onError(String message) {
+                binding.btnSave.setEnabled(true);
+                Toast.makeText(CreateItineraryActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private List<ScheduleItem> buildScheduleItems() {
-        List<ScheduleItem> result = new ArrayList<>();
+    private List<ScheduleItemRequest> buildScheduleItems() {
+        List<ScheduleItemRequest> result = new ArrayList<>();
         for (ScheduleInput input : scheduleAdapter.getItems()) {
             if (TextUtils.isEmpty(input.getPlace())) {
                 continue;
             }
             String desc = TextUtils.isEmpty(input.getDescription())
                     ? input.getPlace() + " 방문" : input.getDescription();
-            result.add(new ScheduleItem(
+            result.add(new ScheduleItemRequest(
                     input.getDay(),
                     input.getTime(),
                     input.getPlace(),

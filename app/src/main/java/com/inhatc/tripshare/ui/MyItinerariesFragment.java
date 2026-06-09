@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,14 +17,19 @@ import com.inhatc.tripshare.CreateItineraryActivity;
 import com.inhatc.tripshare.ItineraryDetailActivity;
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.adapter.TripAdapter;
-import com.inhatc.tripshare.data.MockData;
+import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.FragmentMyItinerariesBinding;
 import com.inhatc.tripshare.model.Trip;
+
+import java.util.List;
 
 public class MyItinerariesFragment extends Fragment implements TripAdapter.OnTripClickListener {
 
     private FragmentMyItinerariesBinding binding;
     private TripAdapter adapter;
+    private final TripRepository repository = TripRepository.getInstance();
+    private int currentTab = 0;
 
     @Nullable
     @Override
@@ -40,16 +46,12 @@ public class MyItinerariesFragment extends Fragment implements TripAdapter.OnTri
         adapter = new TripAdapter(this);
         binding.rvTrips.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvTrips.setAdapter(adapter);
-        adapter.setTrips(MockData.getMyCreatedTrips());
 
         binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0) {
-                    adapter.setTrips(MockData.getMyCreatedTrips());
-                } else {
-                    adapter.setTrips(MockData.getSavedTrips());
-                }
+                currentTab = tab.getPosition();
+                loadTrips();
             }
 
             @Override
@@ -63,6 +65,36 @@ public class MyItinerariesFragment extends Fragment implements TripAdapter.OnTri
 
         binding.fabCreate.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), CreateItineraryActivity.class)));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            loadTrips();
+        }
+    }
+
+    private void loadTrips() {
+        ApiCallback<List<Trip>> callback = new ApiCallback<List<Trip>>() {
+            @Override
+            public void onSuccess(List<Trip> data) {
+                adapter.setTrips(data);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        if (currentTab == 0) {
+            repository.getMyCreatedTrips(callback);
+        } else {
+            repository.getSavedTrips(callback);
+        }
     }
 
     @Override

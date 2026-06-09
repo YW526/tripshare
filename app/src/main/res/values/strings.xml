@@ -41,6 +41,8 @@
     <string name="review_empty">아직 작성된 후기가 없습니다.</string>
     <string name="rating_label">별점</string>
     <string name="follow">팔로우</string>
+    <string name="following">팔로잉</string>
+    <string name="follow_success">팔로우했습니다.</string>
     <string name="save">저장</string>
     <string name="day_format">%d일차</string>
 
@@ -97,4 +99,6 @@
     <string name="email_exists">이미 가입된 이메일입니다.</string>
     <string name="saved_itinerary">일정이 저장되었습니다.</string>
     <string name="notifications_coming">알림 기능은 준비 중입니다.</string>
+    <string name="network_error">서버에 연결할 수 없습니다. Spring 서버가 실행 중인지 확인해주세요.</string>
+    <string name="loading">불러오는 중…</string>
 </resources>
