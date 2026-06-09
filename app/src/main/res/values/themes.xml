@@ -15,7 +15,7 @@
         <item name="android:textColor">@color/white</item>
         <item name="cornerRadius">12dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:minHeight">52dp</item>
+        <item name="android:minHeight">64dp</item>
     </style>
 
     <style name="OutlinePurpleButton" parent="Widget.Material3.Button.OutlinedButton">
@@ -23,6 +23,6 @@
         <item name="android:textColor">@color/purple_primary</item>
         <item name="cornerRadius">12dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:minHeight">52dp</item>
+        <item name="android:minHeight">64dp</item>
     </style>
 </resources>

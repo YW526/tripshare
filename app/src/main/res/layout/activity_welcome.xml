@@ -4,36 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="24dp">
+    android:layout_marginTop="24dp">
 
-    <ImageView
-        android:id="@+id/img_illustration"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_suitcase"
-        app:layout_constraintBottom_toTopOf="@id/tv_welcome_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
+    <!-- 제목 -->
     <TextView
         android:id="@+id/tv_welcome_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:lineSpacingExtra="4dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="32dp"
         android:text="@string/welcome_title"
         android:textColor="@color/purple_primary"
-        android:textSize="26sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_welcome_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:lineSpacingExtra="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/img_illustration" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- 부제목 -->
     <TextView
         android:id="@+id/tv_welcome_subtitle"
         android:layout_width="wrap_content"
@@ -41,32 +31,48 @@
         android:layout_marginTop="12dp"
         android:text="@string/welcome_subtitle"
         android:textColor="@color/text_secondary"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@id/btn_login"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_welcome_title" />
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/tv_welcome_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome_title"/>
 
+    <!-- 여행 이미지 -->
+    <ImageView
+        android:id="@+id/img_illustration"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginTop="50dp"
+        android:contentDescription="@null"
+        android:src="@drawable/welcom"
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome_subtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 로그인 버튼 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_login"
         style="@style/PurpleButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
         android:text="@string/login"
-        app:layout_constraintBottom_toTopOf="@id/btn_signup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/img_illustration"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- 회원가입 버튼 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_signup"
         style="@style/OutlinePurpleButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
         android:text="@string/sign_up"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/btn_login"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
