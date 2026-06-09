@@ -10,12 +10,12 @@
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
+        android:paddingTop="70dp"
         android:gravity="center_vertical"
         android:minHeight="@dimen/toolbar_min_height"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="@dimen/screen_top_extra">
+        android:paddingHorizontal="16dp">
 
         <ImageButton
             android:id="@+id/btn_back"
@@ -52,6 +52,16 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="이메일"
+                android:textColor="#444444"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,10 +79,19 @@
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="비밀번호"
+                android:textColor="#444444"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:hint="@string/password"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -88,10 +107,19 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="비밀번호 확인"
+                android:textColor="#444444"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:hint="@string/confirm_password"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -107,10 +135,19 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="닉네임"
+                android:textColor="#444444"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:hint="@string/nickname"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -127,6 +164,7 @@
 
             <include
                 android:id="@+id/captcha_view"
+                android:layout_marginTop="10dp"
                 layout="@layout/view_captcha" />
 
             <com.google.android.material.button.MaterialButton
@@ -134,7 +172,7 @@
                 style="@style/PurpleButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="50dp"
                 android:text="@string/sign_up" />
         </LinearLayout>
     </ScrollView>
