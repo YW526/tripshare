@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.inhatc.tripshare.databinding.ActivityMainBinding;
@@ -12,7 +11,7 @@ import com.inhatc.tripshare.ui.HomeFragment;
 import com.inhatc.tripshare.ui.MyItinerariesFragment;
 import com.inhatc.tripshare.ui.ProfileFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
 

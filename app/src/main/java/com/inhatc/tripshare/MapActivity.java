@@ -3,8 +3,6 @@ package com.inhatc.tripshare;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.fragment.app.FragmentActivity;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
+public class MapActivity extends BaseActivity implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener {
 
     public static final String EXTRA_TRIP_ID = "trip_id";

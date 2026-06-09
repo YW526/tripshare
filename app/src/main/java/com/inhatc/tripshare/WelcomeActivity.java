@@ -3,11 +3,9 @@ package com.inhatc.tripshare;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.inhatc.tripshare.databinding.ActivityWelcomeBinding;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class WelcomeActivity extends BaseActivity {
 
     private ActivityWelcomeBinding binding;
 

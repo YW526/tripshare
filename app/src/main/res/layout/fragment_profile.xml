@@ -2,8 +2,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true">
+    android:background="@color/background"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:paddingTop="@dimen/screen_top_extra">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,7 +70,6 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="24dp"
             android:background="@drawable/bg_rounded_card"
-            android:elevation="2dp"
             android:orientation="horizontal"
             android:padding="16dp">
 
@@ -83,7 +84,7 @@
                     android:id="@+id/tv_created_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/purple_primary"
+                    android:textColor="@color/text_primary"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -107,7 +108,7 @@
                     android:id="@+id/tv_saved_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/purple_primary"
+                    android:textColor="@color/text_primary"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -131,7 +132,7 @@
                     android:id="@+id/tv_likes_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/purple_primary"
+                    android:textColor="@color/text_primary"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 

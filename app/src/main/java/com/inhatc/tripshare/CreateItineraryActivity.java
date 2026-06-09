@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.inhatc.tripshare.adapter.ScheduleInputAdapter;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class CreateItineraryActivity extends AppCompatActivity {
+public class CreateItineraryActivity extends BaseActivity {
 
     private ActivityCreateItineraryBinding binding;
     private ScheduleInputAdapter scheduleAdapter;

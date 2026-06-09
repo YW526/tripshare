@@ -5,13 +5,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.inhatc.tripshare.data.MockData;
 import com.inhatc.tripshare.databinding.ActivitySignupBinding;
 import com.inhatc.tripshare.util.CaptchaViewHelper;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends BaseActivity {
 
     private ActivitySignupBinding binding;
     private CaptchaViewHelper captchaHelper;

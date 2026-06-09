@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -16,7 +15,7 @@ import com.inhatc.tripshare.data.MockData;
 import com.inhatc.tripshare.databinding.ActivityItineraryDetailBinding;
 import com.inhatc.tripshare.model.Trip;
 
-public class ItineraryDetailActivity extends AppCompatActivity {
+public class ItineraryDetailActivity extends BaseActivity {
 
     public static final String EXTRA_TRIP_ID = "trip_id";
 
