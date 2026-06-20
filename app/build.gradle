@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
 android {
     namespace 'com.inhatc.tripshare'
     compileSdk {
@@ -18,6 +24,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                MAPS_API_KEY: localProperties.getProperty(
+                        'MAPS_API_KEY',
+                        'AIzaSyBGhzT-ZdyQq38z7l_UFcLCwhBOrx2zh5E')
+        ]
     }
 
     buildTypes {

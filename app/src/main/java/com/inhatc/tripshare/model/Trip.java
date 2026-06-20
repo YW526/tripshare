@@ -7,35 +7,44 @@ public class Trip {
     private final long authorUserId;
     private final String title;
     private final String author;
+    private final String authorProfileImage;
     private final String location;
     private final String startDate;
     private final String endDate;
     private final String description;
+    private final String coverUrl;
     private final int imageRes;
     private final int likes;
     private final int comments;
     private final List<ScheduleItem> schedule;
     private final boolean mine;
     private final boolean saved;
+    private final boolean liked;
+    private final boolean followingAuthor;
 
-    public Trip(int id, long authorUserId, String title, String author, String location,
-                String startDate, String endDate, String description,
-                int imageRes, int likes, int comments,
-                List<ScheduleItem> schedule, boolean mine, boolean saved) {
+    public Trip(int id, long authorUserId, String title, String author, String authorProfileImage,
+                String location, String startDate, String endDate, String description,
+                String coverUrl, int imageRes, int likes, int comments,
+                List<ScheduleItem> schedule, boolean mine, boolean saved,
+                boolean liked, boolean followingAuthor) {
         this.id = id;
         this.authorUserId = authorUserId;
         this.title = title;
         this.author = author;
+        this.authorProfileImage = authorProfileImage;
         this.location = location;
         this.startDate = startDate;
         this.endDate = endDate;
         this.description = description;
+        this.coverUrl = coverUrl;
         this.imageRes = imageRes;
         this.likes = likes;
         this.comments = comments;
         this.schedule = schedule;
         this.mine = mine;
         this.saved = saved;
+        this.liked = liked;
+        this.followingAuthor = followingAuthor;
     }
 
     public int getId() {
@@ -54,6 +63,10 @@ public class Trip {
         return author;
     }
 
+    public String getAuthorProfileImage() {
+        return authorProfileImage;
+    }
+
     public String getLocation() {
         return location;
     }
@@ -68,6 +81,10 @@ public class Trip {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
     }
 
     public int getImageRes() {
@@ -92,6 +109,14 @@ public class Trip {
 
     public boolean isSaved() {
         return saved;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public boolean isFollowingAuthor() {
+        return followingAuthor;
     }
 
     public String getDateRange() {

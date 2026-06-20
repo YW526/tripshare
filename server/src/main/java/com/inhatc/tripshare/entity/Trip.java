@@ -33,7 +33,7 @@ public class Trip {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "cover_url", length = 500)
+    @Column(name = "cover_url", columnDefinition = "MEDIUMTEXT")
     private String coverUrl;
 
     @Column(name = "like_count", nullable = false)

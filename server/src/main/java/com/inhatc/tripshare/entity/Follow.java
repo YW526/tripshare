@@ -29,6 +29,14 @@ public class Follow {
         this.followingId = followingId;
     }
 
+    public Long getFollowerId() {
+        return followerId;
+    }
+
+    public Long getFollowingId() {
+        return followingId;
+    }
+
     public static class FollowId implements Serializable {
         private Long followerId;
         private Long followingId;

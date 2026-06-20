@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.inhatc.tripshare.EditProfileActivity;
+import com.inhatc.tripshare.FollowListActivity;
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.WelcomeActivity;
 import com.inhatc.tripshare.adapter.MenuAdapter;
@@ -20,6 +22,7 @@ import com.inhatc.tripshare.api.SessionManager;
 import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.FragmentProfileBinding;
 import com.inhatc.tripshare.model.UserProfile;
+import com.inhatc.tripshare.util.ProfileImageHelper;
 
 public class ProfileFragment extends Fragment {
 
@@ -37,10 +40,31 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bindProfile();
+        setupMenu();
+        binding.btnSettings.setOnClickListener(v ->
+                Toast.makeText(requireContext(), "설정 - 준비 중", Toast.LENGTH_SHORT).show());
+        binding.layoutFollowers.setOnClickListener(v ->
+                startActivity(FollowListActivity.createIntent(requireContext(),
+                        SessionManager.getUserId(), FollowListActivity.TYPE_FOLLOWERS)));
+        binding.layoutFollowing.setOnClickListener(v ->
+                startActivity(FollowListActivity.createIntent(requireContext(),
+                        SessionManager.getUserId(), FollowListActivity.TYPE_FOLLOWING)));
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (binding != null) {
+            bindProfile();
+        }
+    }
+
+    private void bindProfile() {
         UserProfile user = SessionManager.getProfile();
         binding.tvNickname.setText(user.getNickname());
         binding.tvBio.setText(user.getBio());
+        ProfileImageHelper.loadInto(binding.imgProfile, SessionManager.getProfileImage());
 
         repository.loadProfileStats(new ApiCallback<UserProfile>() {
             @Override
@@ -51,6 +75,8 @@ public class ProfileFragment extends Fragment {
                 binding.tvCreatedCount.setText(String.valueOf(data.getCreatedCount()));
                 binding.tvSavedCount.setText(String.valueOf(data.getSavedCount()));
                 binding.tvLikesCount.setText(String.valueOf(data.getLikesReceived()));
+                binding.tvFollowerCount.setText(String.valueOf(data.getFollowerCount()));
+                binding.tvFollowingCount.setText(String.valueOf(data.getFollowingCount()));
             }
 
             @Override
@@ -60,7 +86,9 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+    }
 
+    private void setupMenu() {
         String[] menuItems = {
                 getString(R.string.edit_profile),
                 getString(R.string.change_password),
@@ -75,6 +103,8 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(requireContext(), WelcomeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+            } else if (getString(R.string.edit_profile).equals(menu)) {
+                startActivity(new Intent(requireContext(), EditProfileActivity.class));
             } else {
                 Toast.makeText(requireContext(), menu + " - 준비 중", Toast.LENGTH_SHORT).show();
             }
@@ -82,9 +112,6 @@ public class ProfileFragment extends Fragment {
 
         binding.rvMenu.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvMenu.setAdapter(menuAdapter);
-
-        binding.btnSettings.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "설정 - 준비 중", Toast.LENGTH_SHORT).show());
     }
 
     @Override

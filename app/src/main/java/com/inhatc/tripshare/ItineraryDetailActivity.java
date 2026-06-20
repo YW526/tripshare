@@ -5,8 +5,11 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,10 +18,12 @@ import com.google.android.material.tabs.TabLayout;
 import com.inhatc.tripshare.adapter.ReviewAdapter;
 import com.inhatc.tripshare.adapter.ScheduleAdapter;
 import com.inhatc.tripshare.api.ApiCallback;
+import com.inhatc.tripshare.api.SessionManager;
 import com.inhatc.tripshare.api.TripRepository;
 import com.inhatc.tripshare.databinding.ActivityItineraryDetailBinding;
 import com.inhatc.tripshare.model.Review;
 import com.inhatc.tripshare.model.Trip;
+import com.inhatc.tripshare.util.ProfileImageHelper;
 
 import java.util.List;
 
@@ -32,7 +37,17 @@ public class ItineraryDetailActivity extends BaseActivity {
     private ReviewAdapter reviewAdapter;
     private int tripId;
     private boolean isFollowing;
+    private boolean isSaved;
+    private boolean isLiked;
+    private int likeCount;
     private final TripRepository repository = TripRepository.getInstance();
+
+    private final ActivityResultLauncher<Intent> editLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    loadTrip();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +88,10 @@ public class ItineraryDetailActivity extends BaseActivity {
     }
 
     private void bindTrip() {
-        binding.imgCover.setImageResource(trip.getImageRes());
+        ProfileImageHelper.loadCover(binding.imgCover, trip.getCoverUrl(), trip.getImageRes());
         binding.tvTitle.setText(trip.getTitle());
         binding.tvAuthor.setText(trip.getAuthor());
+        ProfileImageHelper.loadInto(binding.imgAuthor, trip.getAuthorProfileImage());
         binding.tvLocation.setText(trip.getLocation());
         binding.tvDates.setText(trip.getDateRange());
         binding.tvDescription.setText(trip.getDescription());
@@ -88,19 +104,33 @@ public class ItineraryDetailActivity extends BaseActivity {
                 + "기간: " + trip.getDateRange() + "\n\n"
                 + trip.getDescription());
 
-        isFollowing = false;
+        likeCount = trip.getLikes();
+        binding.tvLikes.setText(String.valueOf(likeCount));
+
+        isFollowing = trip.isFollowingAuthor();
+        isSaved = trip.isSaved();
+        isLiked = trip.isLiked();
+        updateFollowButtonVisibility();
         updateFollowButtonStyle();
+        updateSaveButtonStyle();
+        updateLikeButtonStyle();
+        updateMoreButtonVisibility();
     }
 
     private void setupActions() {
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnShare.setOnClickListener(v ->
                 Toast.makeText(this, "공유 기능 준비 중", Toast.LENGTH_SHORT).show());
-        binding.btnMore.setOnClickListener(v ->
-                Toast.makeText(this, "더보기 준비 중", Toast.LENGTH_SHORT).show());
+        binding.btnMore.setOnClickListener(this::showMoreMenu);
         binding.btnFollow.setOnClickListener(v -> toggleFollow());
-        binding.btnSave.setOnClickListener(v -> saveTrip());
+        binding.btnSave.setOnClickListener(v -> toggleSave());
+        binding.btnLike.setOnClickListener(v -> toggleLike());
+        binding.layoutAuthor.setOnClickListener(v -> openAuthorProfile());
         binding.btnMap.setOnClickListener(v -> {
+            if (trip == null) {
+                Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent intent = new Intent(this, MapActivity.class);
             intent.putExtra(MapActivity.EXTRA_TRIP_ID, trip.getId());
             startActivity(intent);
@@ -108,8 +138,32 @@ public class ItineraryDetailActivity extends BaseActivity {
         binding.btnSubmitReview.setOnClickListener(v -> submitReview());
     }
 
+    private void showMoreMenu(View anchor) {
+        if (trip == null || !isOwnTrip()) {
+            return;
+        }
+        PopupMenu menu = new PopupMenu(this, anchor);
+        menu.getMenu().add(0, 0, 0, R.string.edit_itinerary);
+        menu.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == 0) {
+                editLauncher.launch(CreateItineraryActivity.createEditIntent(this, trip.getId()));
+                return true;
+            }
+            return false;
+        });
+        menu.show();
+    }
+
+    private boolean isOwnTrip() {
+        return trip.isMine() || trip.getAuthorUserId() == SessionManager.getUserId();
+    }
+
     private void toggleFollow() {
         if (trip == null || trip.getAuthorUserId() == 0) {
+            return;
+        }
+        if (trip.isMine() || trip.getAuthorUserId() == SessionManager.getUserId()) {
+            Toast.makeText(this, R.string.cannot_follow_self, Toast.LENGTH_SHORT).show();
             return;
         }
         if (isFollowing) {
@@ -133,13 +187,69 @@ public class ItineraryDetailActivity extends BaseActivity {
         });
     }
 
-    private void saveTrip() {
+    private void toggleLike() {
         if (trip == null) {
+            return;
+        }
+        if (isLiked) {
+            repository.unlikeTrip(trip.getId(), new ApiCallback<Void>() {
+                @Override
+                public void onSuccess(Void data) {
+                    isLiked = false;
+                    likeCount = Math.max(0, likeCount - 1);
+                    binding.tvLikes.setText(String.valueOf(likeCount));
+                    updateLikeButtonStyle();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(ItineraryDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            });
+            return;
+        }
+        repository.likeTrip(trip.getId(), new ApiCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                isLiked = true;
+                likeCount += 1;
+                binding.tvLikes.setText(String.valueOf(likeCount));
+                updateLikeButtonStyle();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ItineraryDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void toggleSave() {
+        if (trip == null) {
+            return;
+        }
+        if (isSaved) {
+            repository.unsaveTrip(trip.getId(), new ApiCallback<Void>() {
+                @Override
+                public void onSuccess(Void data) {
+                    isSaved = false;
+                    updateSaveButtonStyle();
+                    Toast.makeText(ItineraryDetailActivity.this,
+                            R.string.unsaved_itinerary, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(ItineraryDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            });
             return;
         }
         repository.saveTrip(trip.getId(), new ApiCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
+                isSaved = true;
+                updateSaveButtonStyle();
                 Toast.makeText(ItineraryDetailActivity.this, R.string.saved_itinerary, Toast.LENGTH_SHORT).show();
             }
 
@@ -148,6 +258,38 @@ public class ItineraryDetailActivity extends BaseActivity {
                 Toast.makeText(ItineraryDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void openAuthorProfile() {
+        if (trip == null || trip.getAuthorUserId() == 0) {
+            return;
+        }
+        if (trip.isMine() || trip.getAuthorUserId() == SessionManager.getUserId()) {
+            return;
+        }
+        startActivity(UserProfileActivity.createIntent(this, trip.getAuthorUserId()));
+    }
+
+    private void updateFollowButtonVisibility() {
+        binding.btnFollow.setVisibility(isOwnTrip() ? View.GONE : View.VISIBLE);
+    }
+
+    private void updateMoreButtonVisibility() {
+        binding.btnMore.setVisibility(isOwnTrip() ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateSaveButtonStyle() {
+        int color = isSaved
+                ? ContextCompat.getColor(this, R.color.purple_primary)
+                : ContextCompat.getColor(this, R.color.text_hint);
+        binding.btnSave.setImageTintList(ColorStateList.valueOf(color));
+    }
+
+    private void updateLikeButtonStyle() {
+        int color = isLiked
+                ? ContextCompat.getColor(this, R.color.purple_primary)
+                : ContextCompat.getColor(this, R.color.text_hint);
+        binding.btnLike.setImageTintList(ColorStateList.valueOf(color));
     }
 
     private void updateFollowButtonStyle() {

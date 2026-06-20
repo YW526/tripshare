@@ -5,10 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.model.ScheduleInput;
@@ -22,11 +25,18 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
         void onScheduleChanged();
     }
 
+    public interface OnPlacePickListener {
+        void onPickPlace(int position, ScheduleInput input);
+    }
+
     private final List<ScheduleInput> items = new ArrayList<>();
     private final OnScheduleChangedListener listener;
+    private final OnPlacePickListener placePickListener;
 
-    public ScheduleInputAdapter(OnScheduleChangedListener listener) {
+    public ScheduleInputAdapter(OnScheduleChangedListener listener,
+                                OnPlacePickListener placePickListener) {
         this.listener = listener;
+        this.placePickListener = placePickListener;
         items.add(new ScheduleInput());
     }
 
@@ -34,9 +44,28 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
         return new ArrayList<>(items);
     }
 
+    public void updateItem(int position, ScheduleInput input) {
+        if (position < 0 || position >= items.size()) {
+            return;
+        }
+        items.set(position, input);
+        notifyItemChanged(position);
+    }
+
     public void addItem() {
         items.add(new ScheduleInput());
         notifyItemInserted(items.size() - 1);
+        listener.onScheduleChanged();
+    }
+
+    public void setItems(List<ScheduleInput> newItems) {
+        items.clear();
+        if (newItems == null || newItems.isEmpty()) {
+            items.add(new ScheduleInput());
+        } else {
+            items.addAll(newItems);
+        }
+        notifyDataSetChanged();
         listener.onScheduleChanged();
     }
 
@@ -73,6 +102,8 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
         private final TextInputEditText etPlace;
         private final TextInputEditText etDescription;
         private final ImageButton btnRemove;
+        private final MaterialButton btnPickPlace;
+        private final TextView tvLocationStatus;
 
         InputViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,6 +112,8 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
             etPlace = itemView.findViewById(R.id.et_place);
             etDescription = itemView.findViewById(R.id.et_description);
             btnRemove = itemView.findViewById(R.id.btn_remove);
+            btnPickPlace = itemView.findViewById(R.id.btn_pick_place);
+            tvLocationStatus = itemView.findViewById(R.id.tv_location_status);
         }
 
         void bind(ScheduleInput input, int position) {
@@ -88,6 +121,7 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
             etTime.setText(input.getTime());
             etPlace.setText(input.getPlace());
             etDescription.setText(input.getDescription());
+            updateLocationStatus(input);
 
             etDay.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
@@ -116,7 +150,29 @@ public class ScheduleInputAdapter extends RecyclerView.Adapter<ScheduleInputAdap
                 }, hour, minute, true).show();
             });
 
+            btnPickPlace.setOnClickListener(v -> {
+                input.setPlace(getText(etPlace));
+                input.setDescription(getText(etDescription));
+                updateDay(input);
+                placePickListener.onPickPlace(position, input);
+            });
+
             btnRemove.setOnClickListener(v -> removeItem(position));
+        }
+
+        private void updateLocationStatus(ScheduleInput input) {
+            if (input.hasLocation()) {
+                tvLocationStatus.setText(itemView.getContext().getString(
+                        R.string.schedule_location_set,
+                        input.getLatitude(),
+                        input.getLongitude()));
+                tvLocationStatus.setTextColor(ContextCompat.getColor(
+                        itemView.getContext(), R.color.purple_primary));
+            } else {
+                tvLocationStatus.setText(R.string.schedule_location_unset);
+                tvLocationStatus.setTextColor(ContextCompat.getColor(
+                        itemView.getContext(), R.color.text_secondary));
+            }
         }
 
         private void updateDay(ScheduleInput input) {

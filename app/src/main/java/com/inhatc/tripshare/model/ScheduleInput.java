@@ -5,6 +5,33 @@ public class ScheduleInput {
     private String time = "09:00";
     private String place = "";
     private String description = "";
+    private double latitude;
+    private double longitude;
+
+    public boolean hasLocation() {
+        return latitude != 0 || longitude != 0;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public int getDay() {
         return day;

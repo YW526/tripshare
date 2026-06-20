@@ -3,10 +3,14 @@ package com.inhatc.tripshare.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.inhatc.tripshare.ItineraryDetailActivity;
 import com.inhatc.tripshare.R;
+import com.inhatc.tripshare.TripListActivity;
 import com.inhatc.tripshare.adapter.TripAdapter;
 import com.inhatc.tripshare.api.ApiCallback;
 import com.inhatc.tripshare.api.TripRepository;
@@ -29,6 +34,7 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
     private FragmentHomeBinding binding;
     private TripAdapter popularAdapter;
     private TripAdapter latestAdapter;
+    private TripAdapter searchAdapter;
     private final TripRepository repository = TripRepository.getInstance();
 
     @Nullable
@@ -45,6 +51,7 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
 
         popularAdapter = new TripAdapter(this);
         latestAdapter = new TripAdapter(this);
+        searchAdapter = new TripAdapter(this);
 
         binding.rvPopular.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvPopular.setAdapter(popularAdapter);
@@ -52,10 +59,28 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
         binding.rvLatest.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvLatest.setAdapter(latestAdapter);
 
+        binding.rvSearch.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvSearch.setAdapter(searchAdapter);
+
         loadTrips();
 
         binding.btnNotifications.setOnClickListener(v ->
                 Toast.makeText(requireContext(), R.string.notifications_coming, Toast.LENGTH_SHORT).show());
+
+        binding.btnPopularMore.setOnClickListener(v ->
+                startActivity(TripListActivity.createIntent(
+                        requireContext(),
+                        getString(R.string.popular_trips),
+                        true)));
+
+        binding.etSearch.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                performSearch(binding.etSearch.getText() != null
+                        ? binding.etSearch.getText().toString() : "");
+                return true;
+            }
+            return false;
+        });
 
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -64,7 +89,7 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                repository.searchTrips(s.toString(), tripCallback(latestAdapter));
+                performSearch(s != null ? s.toString() : "");
             }
 
             @Override
@@ -76,6 +101,47 @@ public class HomeFragment extends Fragment implements TripAdapter.OnTripClickLis
     private void loadTrips() {
         repository.getPopularTrips(tripCallback(popularAdapter));
         repository.getLatestTrips(tripCallback(latestAdapter));
+    }
+
+    private void performSearch(String query) {
+        if (TextUtils.isEmpty(query.trim())) {
+            showHomeSections();
+            loadTrips();
+            return;
+        }
+
+        showSearchSection();
+        repository.searchTrips(query, new ApiCallback<List<Trip>>() {
+            @Override
+            public void onSuccess(List<Trip> data) {
+                if (!isAdded()) {
+                    return;
+                }
+                searchAdapter.setTrips(data);
+                boolean empty = data.isEmpty();
+                binding.rvSearch.setVisibility(empty ? View.GONE : View.VISIBLE);
+                binding.tvSearchEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void showSearchSection() {
+        binding.sectionHome.setVisibility(View.GONE);
+        binding.sectionSearch.setVisibility(View.VISIBLE);
+    }
+
+    private void showHomeSections() {
+        binding.sectionSearch.setVisibility(View.GONE);
+        binding.sectionHome.setVisibility(View.VISIBLE);
+        binding.tvSearchEmpty.setVisibility(View.GONE);
+        binding.rvSearch.setVisibility(View.VISIBLE);
     }
 
     private ApiCallback<List<Trip>> tripCallback(TripAdapter adapter) {

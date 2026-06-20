@@ -20,7 +20,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBGhzT-ZdyQq38z7l_UFcLCwhBOrx2zh5E" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".WelcomeActivity"
@@ -44,6 +44,25 @@
             android:exported="false" />
 
         <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:label="@string/edit_profile" />
+
+        <activity
+            android:name=".UserProfileActivity"
+            android:exported="false"
+            android:label="@string/user_profile" />
+
+        <activity
+            android:name=".TripListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PlacePickerActivity"
+            android:exported="false"
+            android:label="@string/place_picker_title" />
+
+        <activity
             android:name=".MapActivity"
             android:exported="false"
             android:label="@string/map_title" />
@@ -54,6 +73,10 @@
 
         <activity
             android:name=".CreateItineraryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".FollowListActivity"
             android:exported="false" />
     </application>
 

@@ -48,16 +48,20 @@ public final class ApiMapper {
                 authorUserId,
                 dto.title != null ? dto.title : "",
                 dto.author != null ? dto.author : "",
+                dto.authorProfileImage,
                 dto.destination != null ? dto.destination : "",
                 dto.startDate != null ? dto.startDate : "",
                 dto.endDate != null ? dto.endDate : "",
                 dto.description != null ? dto.description : "",
+                dto.coverUrl,
                 imageRes,
                 dto.likeCount,
                 dto.reviewCount,
                 schedule,
                 dto.mine,
-                dto.saved);
+                dto.saved,
+                dto.liked,
+                dto.followingAuthor);
     }
 
     public static List<Trip> toTrips(List<TripDto> dtos) {
@@ -72,9 +76,14 @@ public final class ApiMapper {
     }
 
     public static List<Trip> toPopularTrips(List<TripDto> dtos) {
+        List<Trip> trips = toTripsSortedByLikes(dtos);
+        return trips.subList(0, Math.min(3, trips.size()));
+    }
+
+    public static List<Trip> toTripsSortedByLikes(List<TripDto> dtos) {
         List<Trip> trips = toTrips(dtos);
         trips.sort(Comparator.comparingInt(Trip::getLikes).reversed());
-        return trips.subList(0, Math.min(3, trips.size()));
+        return trips;
     }
 
     public static Review toReview(ReviewDto dto, int tripId) {

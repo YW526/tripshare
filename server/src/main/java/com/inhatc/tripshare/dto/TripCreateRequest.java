@@ -20,6 +20,8 @@ public class TripCreateRequest {
 
     private String description;
 
+    private String coverUrl;
+
     @NotNull
     private Long userId;
 
@@ -63,6 +65,14 @@ public class TripCreateRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
     }
 
     public Long getUserId() {

@@ -23,6 +23,9 @@ public class User {
     @Column(length = 255)
     private String bio;
 
+    @Column(name = "profile_image", columnDefinition = "MEDIUMTEXT")
+    private String profileImage;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -60,6 +63,14 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public LocalDateTime getCreatedAt() {

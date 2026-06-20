@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.inhatc.tripshare.R;
 import com.inhatc.tripshare.model.Trip;
+import com.inhatc.tripshare.util.ProfileImageHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         }
 
         void bind(Trip trip) {
-            imgThumbnail.setImageResource(trip.getImageRes());
+            ProfileImageHelper.loadCover(imgThumbnail, trip.getCoverUrl(), trip.getImageRes());
             tvTitle.setText(trip.getTitle());
             tvAuthor.setText(trip.getAuthor());
             tvLocation.setText(trip.getLocation());

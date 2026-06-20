@@ -26,6 +26,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
+            android:id="@+id/tv_toolbar_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -58,27 +59,44 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <LinearLayout
+            <FrameLayout
+                android:id="@+id/layout_cover_photo"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
                 android:background="@drawable/bg_dashed_box"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:id="@+id/img_cover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_camera" />
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/add_cover_photo"
-                    android:textColor="@color/text_hint"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layout_cover_placeholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_camera" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/add_cover_photo"
+                        android:textColor="@color/text_hint"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </FrameLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -192,6 +210,14 @@
                     android:text="@string/add_schedule"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/map_flow_hint"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_schedule_input"

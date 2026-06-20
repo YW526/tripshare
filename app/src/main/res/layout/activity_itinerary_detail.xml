@@ -93,16 +93,22 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/layout_author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingVertical="4dp">
 
-                <View
+                <ImageView
+                    android:id="@+id/img_author"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:background="@drawable/bg_profile_circle" />
+                    android:background="@drawable/bg_profile_circle"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop" />
 
                 <TextView
                     android:id="@+id/tv_author"
@@ -159,9 +165,11 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                <ImageButton
+                    android:id="@+id/btn_like"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_heart" />
 

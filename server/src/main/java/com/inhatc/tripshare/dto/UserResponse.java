@@ -5,12 +5,19 @@ public class UserResponse {
     private String nickname;
     private String email;
     private String bio;
+    private String profileImage;
+    private long followerCount;
+    private long followingCount;
 
-    public UserResponse(Long id, String nickname, String email, String bio) {
+    public UserResponse(Long id, String nickname, String email, String bio, String profileImage,
+                        long followerCount, long followingCount) {
         this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.bio = bio;
+        this.profileImage = profileImage;
+        this.followerCount = followerCount;
+        this.followingCount = followingCount;
     }
 
     public Long getId() {
@@ -27,5 +34,17 @@ public class UserResponse {
 
     public String getBio() {
         return bio;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public long getFollowerCount() {
+        return followerCount;
+    }
+
+    public long getFollowingCount() {
+        return followingCount;
     }
 }

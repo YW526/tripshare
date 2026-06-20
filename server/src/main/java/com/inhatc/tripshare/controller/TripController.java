@@ -36,6 +36,13 @@ public class TripController {
         return service.createTrip(request);
     }
 
+    @PutMapping("/{tripId}")
+    public TripResponse update(@PathVariable Long tripId,
+                               @RequestParam Long userId,
+                               @Valid @RequestBody TripUpdateRequest request) {
+        return service.updateTrip(tripId, userId, request);
+    }
+
     @GetMapping("/{tripId}/reviews")
     public List<ReviewResponse> reviews(@PathVariable Long tripId) {
         return service.getReviews(tripId);
@@ -51,5 +58,23 @@ public class TripController {
     public Map<String, String> save(@PathVariable Long tripId, @RequestParam Long userId) {
         service.saveTrip(userId, tripId);
         return Map.of("message", "saved");
+    }
+
+    @DeleteMapping("/{tripId}/save")
+    public Map<String, String> unsave(@PathVariable Long tripId, @RequestParam Long userId) {
+        service.unsaveTrip(userId, tripId);
+        return Map.of("message", "unsaved");
+    }
+
+    @PostMapping("/{tripId}/like")
+    public Map<String, String> like(@PathVariable Long tripId, @RequestParam Long userId) {
+        service.likeTrip(userId, tripId);
+        return Map.of("message", "liked");
+    }
+
+    @DeleteMapping("/{tripId}/like")
+    public Map<String, String> unlike(@PathVariable Long tripId, @RequestParam Long userId) {
+        service.unlikeTrip(userId, tripId);
+        return Map.of("message", "unliked");
     }
 }

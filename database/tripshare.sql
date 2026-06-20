@@ -14,6 +14,7 @@ CREATE TABLE users (
     password    VARCHAR(255) NOT NULL COMMENT 'BCrypt 해시',
     nickname    VARCHAR(50)  NOT NULL,
     bio         VARCHAR(255) DEFAULT NULL,
+    profile_image MEDIUMTEXT DEFAULT NULL COMMENT 'Base64 JPEG',
     created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -26,7 +27,7 @@ CREATE TABLE trips (
     start_date   DATE         NOT NULL,
     end_date     DATE         NOT NULL,
     description  TEXT,
-    cover_url    VARCHAR(500) DEFAULT NULL,
+    cover_url    MEDIUMTEXT DEFAULT NULL,
     like_count   INT          NOT NULL DEFAULT 0,
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_trips_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
